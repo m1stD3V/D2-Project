@@ -5,6 +5,7 @@ const ctx = canvas.getContext("2d");
 //Globals
 let mouseDown = false;
 const lines: LineDraw[] = [];
+const undoLines: LineDraw[] = [];
 let currLine: LineDraw | undefined;
 
 const heading = document.createElement("h1");
@@ -32,6 +33,7 @@ canvas.onmousedown = function (pointer) {
   lines.push(newLine);
   currLine = newLine;
   ctx.lineTo(position.x, position.y);
+  undoLines.length = 0;
 };
 
 const stop = () => {
@@ -74,8 +76,18 @@ function redrawPoints() {
 }
 
 function undo() {
+  if (lines.length > 0) {
+    const taken = lines.pop();
+    if (taken) undoLines.push(taken);
+  }
+  redrawPoints();
 }
 function redo() {
+  if (undoLines.length > 0) {
+    const taken = undoLines.pop();
+    if (taken) lines.push(taken);
+  }
+  redrawPoints();
 }
 
 //not yet implemented into drawing or redrawing

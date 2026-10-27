@@ -11,14 +11,12 @@ const heading = document.createElement("h1");
 heading.textContent = "Mapcrafter";
 
 function setStroke(
-  width: number = 3,
-  color: string | CanvasGradient | CanvasPattern = "black",
-  cap: CanvasLineCap = "round",
+  stroke: strokeInfo = { width: 3, color: "black", cap: "round" },
 ) {
   if (!ctx) return;
-  ctx.lineWidth = width;
-  ctx.strokeStyle = color;
-  ctx.lineCap = cap;
+  ctx.lineWidth = stroke.width;
+  ctx.strokeStyle = stroke.color;
+  ctx.lineCap = stroke.cap;
 }
 
 app.append(heading);
@@ -87,13 +85,21 @@ function redrawPoints() {
   }
 }
 
+interface strokeInfo {
+  width: number;
+  color: string | CanvasGradient | CanvasPattern;
+  cap: CanvasLineCap;
+}
+
 class Point {
   x: number;
   y: number;
+  stroke: strokeInfo;
   nextPoint: Point | undefined;
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
+    this.stroke = { width: 3, color: "black", cap: "round" };
   }
   next() {
     if (!this.nextPoint) return null;

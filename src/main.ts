@@ -61,6 +61,32 @@ function fixMouseOffset(pointer: MouseEvent) {
   };
 }
 
+function clearCanvas() {
+  if (!ctx) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function redrawPoints() {
+  if (!ctx) return;
+  clearCanvas();
+  console.log("made it");
+  for (let point of pointStarts) {
+    console.log("head");
+    ctx.stroke();
+    setStroke();
+    ctx.moveTo(point.x, point.y);
+    ctx.beginPath();
+    let nextPoint = point.next();
+
+    while (nextPoint !== null) {
+      point = nextPoint;
+      nextPoint = point.next();
+      ctx.lineTo(point.x, point.y);
+    }
+    ctx.lineTo(point.x, point.y);
+  }
+}
+
 class Point {
   x: number;
   y: number;
@@ -70,6 +96,12 @@ class Point {
     this.y = y;
   }
   next() {
+    if (!this.nextPoint) return null;
     return this.nextPoint;
   }
 }
+
+document.addEventListener("keydown", (event) => {
+  if (event.key == "c") clearCanvas();
+  else redrawPoints();
+});

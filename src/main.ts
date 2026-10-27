@@ -73,6 +73,11 @@ function redrawPoints() {
   }
 }
 
+function undo() {
+}
+function redo() {
+}
+
 //not yet implemented into drawing or redrawing
 interface strokeInfo {
   width: number;
@@ -117,5 +122,7 @@ class Point {
 
 document.addEventListener("keydown", (event) => {
   if (event.key == "c") clearCanvas();
-  else redrawPoints();
+  else if (event.key == "r") redrawPoints();
+  else if (event.key == "z") undo();
+  else if (event.key == "y") redo();
 });

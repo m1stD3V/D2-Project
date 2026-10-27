@@ -4,8 +4,8 @@ const ctx = canvas.getContext("2d");
 
 //Globals
 let mouseDown = false;
-const pointStarts: Point[] = [];
-let currPoint: Point | undefined;
+const lines: LineDraw[] = [];
+let currLine: LineDraw | undefined;
 
 const heading = document.createElement("h1");
 heading.textContent = "Mapcrafter";
@@ -28,26 +28,26 @@ canvas.onmousedown = function (pointer) {
   ctx.beginPath();
   const position = fixMouseOffset(pointer);
   const newPoint = new Point(position.x, position.y);
-  pointStarts.push(newPoint);
-  currPoint = newPoint;
+  const newLine = new LineDraw(newPoint);
+  lines.push(newLine);
+  currLine = newLine;
   ctx.lineTo(position.x, position.y);
 };
 
 const stop = () => {
   mouseDown = false;
-  currPoint = undefined;
+  currLine = undefined;
 };
 
 canvas.onmouseup = stop;
 canvas.onmouseleave = stop;
 
 canvas.onmousemove = function (pointer) {
-  if (!ctx || mouseDown == false || !currPoint) return;
+  if (!ctx || mouseDown == false || !currLine) return;
   const position = fixMouseOffset(pointer);
   ctx.lineTo(position.x, position.y);
   const newPoint = new Point(position.x, position.y);
-  currPoint.nextPoint = newPoint;
-  currPoint = newPoint;
+  currLine.pushingP(newPoint);
   ctx.stroke();
 };
 
@@ -68,42 +68,50 @@ function redrawPoints() {
   if (!ctx) return;
   clearCanvas();
   console.log("made it");
-  for (let point of pointStarts) {
-    console.log("head");
-    ctx.stroke();
-    setStroke();
-    ctx.moveTo(point.x, point.y);
-    ctx.beginPath();
-    let nextPoint = point.next();
-
-    while (nextPoint !== null) {
-      point = nextPoint;
-      nextPoint = point.next();
-      ctx.lineTo(point.x, point.y);
-    }
-    ctx.lineTo(point.x, point.y);
+  for (const line of lines) {
+    line.redrawSelf(ctx);
   }
 }
 
+//not yet implemented into drawing or redrawing
 interface strokeInfo {
   width: number;
   color: string | CanvasGradient | CanvasPattern;
   cap: CanvasLineCap;
 }
 
+class LineDraw {
+  points: Point[];
+  stroke: strokeInfo;
+  constructor(firstPoint: Point) {
+    this.points = [];
+    this.stroke = { width: 3, color: "black", cap: "round" };
+    this.points.push(firstPoint);
+  }
+  pushingP(newPoint: Point) {
+    this.points.push(newPoint);
+  }
+  poppingP() {
+    this.points.pop();
+  }
+  redrawSelf(ctx: CanvasRenderingContext2D) {
+    if (this.points.length === 0) return;
+
+    setStroke(this.stroke);
+    ctx.beginPath();
+    ctx.moveTo(this.points[0].x, this.points[0].y);
+    for (const point of this.points) {
+      ctx.lineTo(point.x, point.y);
+    }
+    ctx.stroke();
+  }
+}
 class Point {
   x: number;
   y: number;
-  stroke: strokeInfo;
-  nextPoint: Point | undefined;
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
-    this.stroke = { width: 3, color: "black", cap: "round" };
-  }
-  next() {
-    if (!this.nextPoint) return null;
-    return this.nextPoint;
   }
 }
 

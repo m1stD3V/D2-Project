@@ -2,7 +2,10 @@ const app = document.querySelector<HTMLElement>("#app")!;
 const canvas = document.querySelector<HTMLCanvasElement>("#gridCanvas")!;
 const ctx = canvas.getContext("2d");
 
+//Globals
 let mouseDown = false;
+const pointStarts: Point[] = [];
+let currPoint: Point | undefined;
 
 const heading = document.createElement("h1");
 heading.textContent = "Mapcrafter";
@@ -26,20 +29,27 @@ canvas.onmousedown = function (pointer) {
   setStroke();
   ctx.beginPath();
   const position = fixMouseOffset(pointer);
+  const newPoint = new Point(position.x, position.y);
+  pointStarts.push(newPoint);
+  currPoint = newPoint;
   ctx.lineTo(position.x, position.y);
 };
 
-canvas.onmouseup = function () {
+const stop = () => {
   mouseDown = false;
+  currPoint = undefined;
 };
-canvas.onmouseleave = function () {
-  mouseDown = false;
-};
+
+canvas.onmouseup = stop;
+canvas.onmouseleave = stop;
 
 canvas.onmousemove = function (pointer) {
-  if (!ctx || mouseDown == false) return;
+  if (!ctx || mouseDown == false || !currPoint) return;
   const position = fixMouseOffset(pointer);
   ctx.lineTo(position.x, position.y);
+  const newPoint = new Point(position.x, position.y);
+  currPoint.nextPoint = newPoint;
+  currPoint = newPoint;
   ctx.stroke();
 };
 
@@ -49,4 +59,17 @@ function fixMouseOffset(pointer: MouseEvent) {
     x: (pointer.clientX - rect.left) * (canvas.width / rect.width),
     y: (pointer.clientY - rect.top) * (canvas.height / rect.height),
   };
+}
+
+class Point {
+  x: number;
+  y: number;
+  nextPoint: Point | undefined;
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+  next() {
+    return this.nextPoint;
+  }
 }

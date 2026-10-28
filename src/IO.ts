@@ -29,3 +29,34 @@ export function exportHighRes(
   link.href = highResCanvas.toDataURL("image/png");
   link.click();
 }
+
+
+export function exportDrawingJSON(lines: LineDraw[]. stamps: StampDraw[]) {
+  const data = JSON.stringify({
+    lines: lines.map(l => ({
+      points: l.points,
+      stroke: l.stroke
+    })),
+
+    stamps: stamps.map(s => ({
+      x: s.x,
+      y: s.y,
+      width: s.width,
+      height: s.height,
+      src: s.src
+    }))
+  });
+
+  const blob = new Blob(
+    [data],
+    {type: "application/json"}
+  );
+
+  const link = document.crreateElement("a");
+  link.download = "drawing-data.json";
+  link.href = URL.createObjectURL(blob);
+  link.click();
+}
+
+
+

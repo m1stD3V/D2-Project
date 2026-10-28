@@ -28,7 +28,7 @@ canvas.onmousedown = function (pointer) {
   setStroke();
   ctx.beginPath();
   const position = fixMouseOffset(pointer);
-  const newPoint = new Point(position.x, position.y);
+  const newPoint = position
   const newLine = new LineDraw(newPoint);
   lines.push(newLine);
   currLine = newLine;
@@ -48,7 +48,7 @@ canvas.onmousemove = function (pointer) {
   if (!ctx || mouseDown == false || !currLine) return;
   const position = fixMouseOffset(pointer);
   ctx.lineTo(position.x, position.y);
-  const newPoint = new Point(position.x, position.y);
+  const newPoint = position;
   currLine.pushingP(newPoint);
   ctx.stroke();
 };
@@ -123,13 +123,9 @@ class LineDraw {
     ctx.stroke();
   }
 }
-class Point {
+interface Point {
   x: number;
   y: number;
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
 }
 
 document.addEventListener("keydown", (event) => {

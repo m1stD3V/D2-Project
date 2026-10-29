@@ -1,9 +1,32 @@
 import { LineDraw, Point, strokeInfo } from "./main.ts";
 
+export interface SerializedPoint {
+  x: number;
+  y: number;
+}
+
+export interface SerializedLine {
+  points: SerializedPoint[];
+  stroke: strokeInfo;
+}
+
+export interface SerializedStamp {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  src: string;
+}
+
+export interface SerializedProject {
+  lines: SerializedLine[];
+  stamps?: SerializedStamp[];
+}
+
 export function exportHighRes(
   lines: LineDraw[],
   stamps: StampDraw[],
-  orginialWidth: number,
+  originalWidth: number,
   originalHeight: number,
   scale: number = 2,
 ) {
@@ -51,7 +74,7 @@ export function exportDrawingJSON(lines: LineDraw[], stamps: StampDraw[]) {
     { type: "application/json" },
   );
 
-  const link = document.crreateElement("a");
+  const link = document.createElement("a");
   link.download = "drawing-data.json";
   link.href = URL.createObjectURL(blob);
   link.click();
@@ -64,25 +87,27 @@ export function importDrawingJSON(
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
-      const json = JSON.parse(e.target?.result as string);
+      const json = JSON.parse(e.target?.result as string) as SerializedProject;
 
-      const loadedLines: LineDraw[] = json.lines.map((l: any) => {
+      const loadedLines: LineDraw[] = json.lines.map((l: SerializedLine) => {
         const firstPoint = new Point(l.points[0].x, l.points[0].y);
         const line = new LineDraw(firstPoint);
         line.stroke = l.stroke;
-        line.points = l.points.map((p: any) => new Point(p.x, p.y));
+        line.points = l.points.map((p: SerializedPoint) => new Point(p.x, p.y));
         return line;
       });
 
       const loadedStamps: StampDraw[] = [];
       let loadedCount = 0;
 
+      const stampsData = json.stamps;
+
       if (!json.stamps || json.stamps.length === 0) {
         callback(loadedLines, []);
         return;
       }
 
-      json.stamps.forEach((s: any) => {
+      json.stamps.forEach((s: SerializedStamp) => {
         const img = new Image();
         img.src = s.src;
         img.onload = () => {
@@ -90,7 +115,7 @@ export function importDrawingJSON(
             new StampDraw(img, s.x, s.y, s.width, s.height, s.src),
           );
           loadedCount++;
-          if (loadedCount === json.stamps.length) {
+          if (loadedCount === stampsData!.length) {
             callback(loadedLines, loadedStamps);
           }
         };

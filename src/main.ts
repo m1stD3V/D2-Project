@@ -4,13 +4,18 @@ import {
   importDrawingJSON,
   StampDraw,
 } from "./IO.ts";
+import Grid from "./grid.ts";
 
 const app = document.querySelector<HTMLElement>("#app")!;
-const canvas = document.querySelector<HTMLCanvasElement>("#gridCanvas")!;
-const ctx = canvas.getContext("2d");
+export const canvas = document.querySelector<HTMLCanvasElement>("#gridCanvas")!;
+export const ctx = canvas.getContext("2d");
 
 //Globals
 let mouseDown = false;
+let snapToGrid = true;
+//export const layerLines: LineDraw[][] = [];
+const GRIDSIZE: number = 25;
+const grid = new Grid(GRIDSIZE);
 export const lines: LineDraw[] = [];
 export const undoLines: LineDraw[] = [];
 export const stamps: StampDraw[] = [];
@@ -45,7 +50,7 @@ fileInputJSON.onchange = (e) => {
       lines.push(...loadedLines);
       stamps.length = 0;
       stamps.push(...loadedStamps);
-      redrawPoints();
+      redrawCanvas();
     });
   }
 };
@@ -75,7 +80,7 @@ stampFileInput.onchange = (e) => {
 toolbar.append(btnHighRes, btnExportJSON, fileInputJSON, stampFileInput);
 app.append(toolbar);
 
-function setStroke(
+export function setStroke(
   stroke: strokeInfo = { width: 3, color: "black", cap: "round" },
 ) {
   if (!ctx) return;
@@ -93,7 +98,7 @@ canvas.onmousedown = function (pointer) {
   if (activeStampImage) {
     const newStamp = new StampDraw(activeStampImage, position.x, position.y);
     stamps.push(newStamp);
-    redrawPoints();
+    redrawCanvas();
     return;
   }
 
@@ -109,6 +114,7 @@ canvas.onmousedown = function (pointer) {
 };
 
 const stop = () => {
+  if (currLine != undefined && snapToGrid) grid.snapToGrid(currLine);
   mouseDown = false;
   currLine = undefined;
 };
@@ -136,9 +142,10 @@ function fixMouseOffset(pointer: MouseEvent) {
 function clearCanvas() {
   if (!ctx) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  grid.setupGrid();
 }
 
-function redrawPoints() {
+export function redrawCanvas() {
   if (!ctx) return;
   clearCanvas();
   console.log("made it");
@@ -155,14 +162,14 @@ function undo() {
     const taken = lines.pop();
     if (taken) undoLines.push(taken);
   }
-  redrawPoints();
+  redrawCanvas();
 }
 function redo() {
   if (undoLines.length > 0) {
     const taken = undoLines.pop();
     if (taken) lines.push(taken);
   }
-  redrawPoints();
+  redrawCanvas();
 }
 
 //not yet implemented into drawing or redrawing
@@ -208,9 +215,10 @@ document.addEventListener("keydown", (event) => {
     lines.length = 0;
     lines.length = 0;
     clearCanvas();
-  } else if (event.key == "r") redrawPoints();
+  } else if (event.key == "r") redrawCanvas();
   else if (event.key == "z") undo();
   else if (event.key == "y") redo();
+  else if (event.key == "g") snapToGrid = !snapToGrid;
   else if (event.key == "h") {
     exportHighRes(lines, stamps, canvas.width, canvas.height, 3);
   }

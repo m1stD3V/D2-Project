@@ -23,20 +23,27 @@ let currLine: LineDraw | undefined;
 let activeStampImage: HTMLImageElement | null = null;
 
 const heading = document.createElement("h1");
+heading.className = "heading";
 heading.textContent = "Mapcrafter";
 app.append(heading);
 
 const toolbar = document.createElement("div");
-toolbar.style.margin = "10px 0";
+toolbar.className = "toolbar";
 
 const btnHighRes = document.createElement("button");
-btnHighRes.textContent = "Export High Res PNG File (H)";
+btnHighRes.textContent = "Export(H)";
 btnHighRes.onclick = () =>
   exportHighRes(lines, stamps, canvas.width, canvas.height, 3);
 
 const btnExportJSON = document.createElement("button");
-btnExportJSON.textContent = "Save Project Data (JSON)";
+btnExportJSON.textContent = "Save(JSON)";
 btnExportJSON.onclick = () => exportDrawingJSON(lines, stamps);
+
+const btnPen = document.createElement("button");
+btnPen.textContent = "Pen (P)";
+btnPen.onclick = () => {
+  activeStampImage = null;
+};
 
 const fileInputJSON = document.createElement("input");
 fileInputJSON.type = "file";
@@ -67,6 +74,7 @@ stampFileInput.onchange = (e) => {
       const img = new Image();
       img.onload = () => {
         activeStampImage = img;
+        stampFileInput.value = "";
         alert(
           "Stamp Successfully Loaded! Click on the canvas to apply the stamp.",
         );
@@ -77,7 +85,7 @@ stampFileInput.onchange = (e) => {
   }
 };
 
-toolbar.append(btnHighRes, btnExportJSON, fileInputJSON, stampFileInput);
+toolbar.append(btnPen, btnHighRes, btnExportJSON, fileInputJSON, stampFileInput);
 app.append(toolbar);
 
 export function setStroke(
@@ -196,7 +204,9 @@ export class LineDraw {
   redrawSelf(ctx: CanvasRenderingContext2D) {
     if (this.points.length === 0) return;
 
-    setStroke(this.stroke);
+    ctx.lineWidth = this.stroke.width;
+    ctx.strokeStyle = this.stroke.color;
+    ctx.lineCap = this.stroke.cap;
     ctx.beginPath();
     ctx.moveTo(this.points[0].x, this.points[0].y);
     for (const point of this.points) {
@@ -213,7 +223,7 @@ export interface Point {
 document.addEventListener("keydown", (event) => {
   if (event.key == "c") {
     lines.length = 0;
-    lines.length = 0;
+    stamps.length = 0;
     clearCanvas();
   } else if (event.key == "r") redrawCanvas();
   else if (event.key == "z") undo();
@@ -221,5 +231,5 @@ document.addEventListener("keydown", (event) => {
   else if (event.key == "g") snapToGrid = !snapToGrid;
   else if (event.key == "h") {
     exportHighRes(lines, stamps, canvas.width, canvas.height, 3);
-  }
+  } else if (event.key == "p") activeStampImage = null;
 });

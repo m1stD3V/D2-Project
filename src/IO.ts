@@ -27,6 +27,9 @@ export function exportHighRes(
 
   if (!ctx) return;
 
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, highResCanvas.width, highResCanvas.height);
+
   ctx.scale(scale, scale);
 
   for (const line of lines) {

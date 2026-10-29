@@ -3,3 +3,37 @@
   justify-content: center;
   align-items: center;
 }
+
+.heading {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.toolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+
+  z-index: 1000;
+  box-sizing: border-box;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.canvas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.details {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}

@@ -85,7 +85,13 @@ stampFileInput.onchange = (e) => {
   }
 };
 
-toolbar.append(btnPen, btnHighRes, btnExportJSON, fileInputJSON, stampFileInput);
+toolbar.append(
+  btnPen,
+  btnHighRes,
+  btnExportJSON,
+  fileInputJSON,
+  stampFileInput,
+);
 app.append(toolbar);
 
 export function setStroke(

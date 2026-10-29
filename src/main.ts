@@ -100,7 +100,7 @@ canvas.onmousedown = function (pointer) {
   mouseDown = true;
   setStroke();
   ctx.beginPath();
-  const newPoint = new Point(position.x, position.y);
+  const newPoint = position;
   const newLine = new LineDraw(newPoint);
   lines.push(newLine);
   currLine = newLine;
@@ -198,13 +198,9 @@ export class LineDraw {
     ctx.stroke();
   }
 }
-export class Point {
+export interface Point {
   x: number;
   y: number;
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
 }
 
 document.addEventListener("keydown", (event) => {

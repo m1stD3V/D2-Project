@@ -1,14 +1,4 @@
-import { LineDraw, Point, strokeInfo } from "./main.ts";
-
-export interface SerializedPoint {
-  x: number;
-  y: number;
-}
-
-export interface SerializedLine {
-  points: SerializedPoint[];
-  stroke: strokeInfo;
-}
+import { LineDraw, Point } from "./main.ts";
 
 export interface SerializedStamp {
   x: number;
@@ -19,7 +9,7 @@ export interface SerializedStamp {
 }
 
 export interface SerializedProject {
-  lines: SerializedLine[];
+  lines: LineDraw[];
   stamps?: SerializedStamp[];
 }
 
@@ -89,11 +79,11 @@ export function importDrawingJSON(
     try {
       const json = JSON.parse(e.target?.result as string) as SerializedProject;
 
-      const loadedLines: LineDraw[] = json.lines.map((l: SerializedLine) => {
-        const firstPoint = new Point(l.points[0].x, l.points[0].y);
+      const loadedLines: LineDraw[] = json.lines.map((l: LineDraw) => {
+        const firstPoint = { x: l.points[0].x, y: l.points[0].y };
         const line = new LineDraw(firstPoint);
         line.stroke = l.stroke;
-        line.points = l.points.map((p: SerializedPoint) => new Point(p.x, p.y));
+        line.points = l.points.map((p: Point) => ({ x: p.x, y: p.y }));
         return line;
       });
 

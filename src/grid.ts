@@ -1,4 +1,4 @@
-import { canvas, ctx, LineDraw, redrawCanvas, setStroke } from "./main.ts";
+import { canvas, ctx, LineDraw, redrawCanvas } from "./main.ts";
 
 interface gridLine {
   x1: number;
@@ -9,37 +9,49 @@ interface gridLine {
 export default class Grid {
   gridsize: number;
   gridLineWidth: number;
+  gridLineColor: string;
   gridLines: gridLine[];
+  visible: boolean;
   constructor(gridsize: number) {
     this.gridsize = gridsize;
     this.gridLineWidth = 2;
+    this.gridLineColor = "#a2f8f2";
     this.gridLines = [];
+    this.visible = true;
     this.setupGrid();
   }
+  setSize(gridsize: number) {
+    this.gridsize = gridsize;
+    this.setupGrid();
+  }
+
   setupGrid() {
     this.gridLines.length = 0;
-    const rect = canvas.getBoundingClientRect();
-    for (let x = 0; x <= rect.width; x += this.gridsize) {
-      this.gridLines.push({ x1: x, x2: x, y1: 0, y2: rect.height });
+    for (let x = 0; x <= canvas.width; x += this.gridsize) {
+      this.gridLines.push({ x1: x, x2: x, y1: 0, y2: canvas.height });
     }
-    for (let y = 0; y <= rect.width; y += this.gridsize) {
-      this.gridLines.push({ y1: y, y2: y, x1: 0, x2: rect.width });
+    for (let y = 0; y <= canvas.height; y += this.gridsize) {
+      this.gridLines.push({ y1: y, y2: y, x1: 0, x2: canvas.width });
     }
-    this.drawGrid();
   }
+
   drawGrid() {
-    setStroke({
-      width: this.gridLineWidth,
-      color: "#a2f8f2",
-      cap: "round",
-    });
-    if (!ctx) return;
+    if (this.visible) this.drawGridOn(ctx);
+  }
+
+  drawGridOn(target: CanvasRenderingContext2D | null) {
+    if (!target) return;
+    target.save();
+    target.lineWidth = this.gridLineWidth;
+    target.strokeStyle = this.gridLineColor;
+    target.lineCap = "round";
+    target.beginPath();
     for (const line of this.gridLines) {
-      ctx.beginPath();
-      ctx.moveTo(line.x1, line.y1);
-      ctx.lineTo(line.x2, line.y2);
-      ctx.stroke();
+      target.moveTo(line.x1, line.y1);
+      target.lineTo(line.x2, line.y2);
     }
+    target.stroke();
+    target.restore();
   }
   alignGridline(line: gridLine) {
     const rect = canvas.getBoundingClientRect();
@@ -60,14 +72,15 @@ export default class Grid {
     const gridIndex = Math.round(distance / this.gridsize);
     return gridIndex * this.gridsize;
   }
+
+  snapToCellCenter(distance: number) {
+    return (Math.floor(distance / this.gridsize) + 0.5) * this.gridsize;
+  }
+
   liquidateLine(line: LineDraw) {
-    const seen = new Set<string>();
-    line.points = line.points.filter((p) => {
-      const key = `${p.x},${p.y}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+    line.points = line.points.filter(
+      (p, i, pts) => i === 0 || p.x !== pts[i - 1].x || p.y !== pts[i - 1].y,
+    );
   }
   redrawSnappedLine() {
     redrawCanvas();

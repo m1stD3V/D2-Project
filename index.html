@@ -3,16 +3,96 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>D2 project</title>
-    <link rel="stylesheet" href="./style.css">
+    <title>Mapcrafter</title>
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <main id="app"></main>
+    <header class="topbar">
+      <h1>Mapcrafter</h1>
+      <label class="check">
+        <input type="checkbox" id="exportGrid" checked /> Grid in PNG
+      </label>
+      <button id="btnExport" title="Export high resolution PNG (H)">
+        Export PNG
+      </button>
+      <button id="btnSave" title="Save project as JSON">Save</button>
+      <label class="btn" title="Load a saved JSON project">
+        Load
+        <input type="file" id="loadJSON" accept=".json" hidden />
+      </label>
+    </header>
 
-    <div class="center">
-      <canvas id="gridCanvas" width="640" height="480"
-        style="border:1px solid #000000;"></canvas>
-      <script type="module" src="/src/main.ts"></script>
-    </div>
+    <aside class="tools" aria-label="Tools">
+      <section class="group">
+        <h2>Draw</h2>
+        <button id="btnPen" title="Pen (P)">Pen</button>
+        <label class="field">
+          Color
+          <input type="color" id="penColor" value="#000000" />
+        </label>
+        <label class="field">
+          Width
+          <span class="range">
+            <input type="range" id="penWidth" min="1" max="12" value="3" />
+            <output id="penWidthOut">3</output>
+          </span>
+        </label>
+      </section>
+
+      <section class="group">
+        <h2>History</h2>
+        <div class="row">
+          <button id="btnUndo" title="Undo (Z or Ctrl+Z)" disabled>Undo</button>
+          <button id="btnRedo" title="Redo (Y or Ctrl+Y)" disabled>Redo</button>
+        </div>
+        <button id="btnClear" title="Clear the map (C)">Clear map</button>
+      </section>
+
+      <section class="group">
+        <h2>Grid</h2>
+        <label class="check">
+          <input type="checkbox" id="showGrid" checked /> Show grid
+        </label>
+        <label class="check">
+          <input type="checkbox" id="snapBox" checked /> Snap to grid (G)
+        </label>
+        <label class="field">
+          Cell size
+          <select id="gridSize">
+            <option value="20">20 px</option>
+            <option value="30">30 px</option>
+            <option value="40" selected>40 px</option>
+            <option value="60">60 px</option>
+            <option value="80">80 px</option>
+          </select>
+        </label>
+      </section>
+    </aside>
+
+    <main class="stage">
+      <canvas id="gridCanvas" width="960" height="720"></canvas>
+    </main>
+
+    <aside class="stamps" aria-label="Stamps">
+      <section class="group">
+        <h2>Stamps</h2>
+        <label class="btn">
+          Add images
+          <input type="file" id="stampFiles" accept="image/*" multiple hidden />
+        </label>
+        <div id="stampList" class="stamp-list"></div>
+        <p class="hint">
+          Pick a stamp, then click the map. Stamps fill one cell and snap to
+          cell centers while snapping is on.
+        </p>
+      </section>
+    </aside>
+
+    <footer class="status">
+      <span id="toolStatus">Tool: Pen</span>
+      <span>P pen, Z undo, Y redo, G snap, H export, C clear</span>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

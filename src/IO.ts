@@ -19,6 +19,7 @@ export function exportHighRes(
   originalWidth: number,
   originalHeight: number,
   scale: number = 2,
+  drawGrid?: (ctx: CanvasRenderingContext2D) => void,
 ) {
   const highResCanvas = document.createElement("canvas");
   highResCanvas.width = originalWidth * scale;
@@ -31,6 +32,8 @@ export function exportHighRes(
   ctx.fillRect(0, 0, highResCanvas.width, highResCanvas.height);
 
   ctx.scale(scale, scale);
+
+  if (drawGrid) drawGrid(ctx);
 
   for (const line of lines) {
     line.redrawSelf(ctx);

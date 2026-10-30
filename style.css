@@ -1,39 +1,266 @@
-.center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+:root {
+  --bg: #f1e3c3;
+  --panel: #f8efd8;
+  --border: #c6ac7c;
+  --text: #3b2a1a;
+  --muted: #7a6446;
+  --accent: #c2540a;
+  --accent-hover: #a94707;
+  --accent-deep: #7d3304;
+  --accent-text: #ffffff;
+  color-scheme: light;
 }
 
-.heading {
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 220px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "top top top"
+    "tools stage stamps"
+    "status status status";
+  font-family: Georgia, serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.topbar {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar h1 {
+  margin: 0 auto 0 0;
+  font-size: 1.2rem;
+}
+
+.tools,
+.stamps {
+  overflow-y: auto;
+  padding: 12px;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tools {
+  grid-area: tools;
+  border-right: 1px solid var(--border);
+}
+
+.stamps {
+  grid-area: stamps;
+  border-left: 1px solid var(--border);
+}
+
+.stage {
+  grid-area: stage;
+  overflow: auto;
+  padding: 16px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
 }
 
-.toolbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
+#gridCanvas {
   width: 100%;
-
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-
-  z-index: 1000;
-  box-sizing: border-box;
-  padding: 12px;
+  max-width: 1200px;
+  height: auto;
   background: #ffffff;
+  box-shadow: 0 0 0 1px var(--border);
+  cursor: crosshair;
 }
 
-.canvas {
+.status {
+  grid-area: status;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.group h2 {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.row > button {
+  flex: 1;
+}
+
+.field {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
 }
 
-.details {
+.range {
   display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
+  align-items: center;
+  gap: 6px;
+}
+
+.range input {
+  width: 90px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+input[type="checkbox"],
+input[type="range"] {
+  accent-color: var(--accent);
+}
+
+button,
+.btn {
+  font: inherit;
+  padding: 6px 10px;
+  color: var(--accent-text);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn {
+  display: inline-block;
+  text-align: center;
+}
+
+button:hover:not(:disabled),
+.btn:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+button.active {
+  background: var(--accent-deep);
+  border-color: var(--accent-deep);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+select {
+  font: inherit;
+  padding: 6px 10px;
+  color: var(--text);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.stamp-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+}
+
+.stamp {
+  aspect-ratio: 1;
+  padding: 4px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+}
+
+.stamp:hover:not(:disabled) {
+  background: var(--bg);
+  border-color: var(--accent);
+}
+
+.stamp.active {
+  background: var(--bg);
+  border: 2px solid var(--accent);
+}
+
+.stamp img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+@media (max-width: 860px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+  }
+
+  body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto auto;
+    grid-template-areas:
+      "top"
+      "tools"
+      "stage"
+      "stamps"
+      "status";
+  }
+
+  .tools {
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stamps {
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .status {
+    flex-direction: column;
+  }
 }

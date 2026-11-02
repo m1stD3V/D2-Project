@@ -272,6 +272,25 @@ stampFileInput.onchange = () => {
   stampFileInput.value = "";
 };
 
+function addEmojiStamp(emoji: string) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 64;
+  canvas.height = 64;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  ctx.font = "48px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(emoji, 32, 32);
+
+  const img = new Image();
+  img.onload = () => {
+    addStampToLibrary(img);
+  };
+  img.src = canvas.toDataURL("image/png");
+}
+
 export interface strokeInfo {
   width: number;
   color: string | CanvasGradient | CanvasPattern;
@@ -354,6 +373,9 @@ document.addEventListener("keydown", (event) => {
       break;
   }
 });
+
+addEmojiStamp("💻");
+addEmojiStamp("😊");
 
 setActiveStamp(null);
 redrawCanvas();

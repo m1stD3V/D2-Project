@@ -19,7 +19,6 @@ export function exportHighRes(
   originalWidth: number,
   originalHeight: number,
   scale: number = 2,
-  p0?: ((target: any) => void) | undefined,
   drawGrid?: (ctx: CanvasRenderingContext2D) => void,
 ) {
   const highResCanvas = document.createElement("canvas");
